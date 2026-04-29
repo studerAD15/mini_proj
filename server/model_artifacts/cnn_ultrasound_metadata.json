@@ -1,0 +1,11 @@
+{
+  "artifactType": "keras",
+  "artifactPath": "D:\\mini_proj\\server\\model_artifacts\\cnn_ultrasound_model.keras",
+  "classNames": [
+    "Healthy",
+    "Liver Disease"
+  ],
+  "source": "demo-generated",
+  "generatedAtUtc": "2026-04-26T05:39:34.660720+00:00",
+  "note": "Demo CNN artifact generated locally to make the ultrasound route operable. Replace with notebook-trained weights for meaningful predictions."
+}
