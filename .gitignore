@@ -3,3 +3,9 @@ dist
 .env
 server/.env
 client/.env
+.qodo
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.timestamp-*.mjs
