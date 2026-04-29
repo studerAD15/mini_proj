@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: liver-risk-api
+    runtime: docker
+    rootDir: server
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PYTHON_EXECUTABLE
+        value: python3

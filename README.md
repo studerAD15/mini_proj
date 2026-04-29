@@ -121,3 +121,147 @@ Important:
 
 - the generated demo CNN makes the route operable, but it is not a medically meaningful trained ultrasound model
 - replace it with your real notebook-trained Keras artifact for real image inference
+
+## 7) Deploy Ready Setup
+
+This repo is now prepared for:
+
+- `Vercel` for the frontend in `client/`
+- `Render` for the backend in `server/`
+- `MongoDB Atlas` for the database
+
+Files added for deployment:
+
+- `client/vercel.json`
+- `server/Dockerfile`
+- `server/.dockerignore`
+- `render.yaml`
+
+## 8) Step-by-Step Deploy To Vercel + Render
+
+### A. Prepare MongoDB Atlas
+
+1. Create or open your MongoDB Atlas cluster
+2. Create a database user
+3. Add your IP access or allow access from anywhere for deployment
+4. Use a connection string with a real database name, for example:
+
+```bash
+mongodb+srv://USERNAME:PASSWORD@cluster0.xxxxx.mongodb.net/liver_risk_ai?retryWrites=true&w=majority&appName=Cluster0
+```
+
+### B. Deploy Backend To Render
+
+1. Push this repo to GitHub
+2. Go to Render and click `New +` -> `Blueprint`
+3. Select this repository
+4. Render will detect `render.yaml`
+5. When prompted, set these environment variables:
+   - `MONGO_URI=your atlas connection string`
+   - `CLIENT_ORIGIN=https://your-vercel-frontend-url.vercel.app`
+6. Deploy
+
+Render backend notes:
+
+- Root directory: `server`
+- Runtime: Docker
+- Health check path: `/health`
+- The backend will expose routes like:
+  - `https://your-render-service.onrender.com/health`
+  - `https://your-render-service.onrender.com/api/model-info`
+
+### C. Deploy Frontend To Vercel
+
+1. Go to Vercel and click `Add New Project`
+2. Import this GitHub repository
+3. Set the root directory to:
+
+```bash
+client
+```
+
+4. Vercel should use:
+   - Build command: `npm run build`
+   - Output directory: `dist`
+
+5. Add this environment variable:
+
+```bash
+VITE_API_URL=https://your-render-service.onrender.com/api
+```
+
+6. Deploy
+
+### D. Update Backend CORS
+
+After Vercel gives you the real frontend URL:
+
+1. Open Render service settings
+2. Update:
+
+```bash
+CLIENT_ORIGIN=https://your-real-vercel-url.vercel.app
+```
+
+3. Redeploy the backend if needed
+
+You can also support multiple frontend URLs by comma-separating them:
+
+```bash
+CLIENT_ORIGIN=https://prod-url.vercel.app,http://localhost:5173
+```
+
+## 9) Production Environment Variables
+
+### Render backend
+
+Set these on Render:
+
+```bash
+MONGO_URI=your_atlas_uri
+CLIENT_ORIGIN=https://your-frontend.vercel.app
+PYTHON_EXECUTABLE=python3
+NODE_ENV=production
+```
+
+### Vercel frontend
+
+Set this on Vercel:
+
+```bash
+VITE_API_URL=https://your-backend.onrender.com/api
+```
+
+## 10) Deploy Verification Checklist
+
+After both deploys:
+
+1. Open the frontend URL
+2. Confirm the dashboard loads
+3. Test:
+   - patient prediction
+   - model info
+   - model comparison
+   - history saving
+   - ultrasound image analysis
+4. Open backend health endpoint:
+
+```bash
+https://your-backend.onrender.com/health
+```
+
+Expected response:
+
+```json
+{
+  "ok": true,
+  "service": "liver-risk-api"
+}
+```
+
+## 11) Important Deployment Notes
+
+- The backend uses Python ML dependencies, so Docker deployment on Render is the safest option
+- The demo CNN artifact works for app operability, but replace it with your notebook-trained `.keras` or `.h5` artifact for meaningful image predictions
+- If you rotate MongoDB credentials, update `MONGO_URI` on Render immediately
+- If Render sleeps on a free plan, the first prediction request may be slower
